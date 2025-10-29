@@ -1,0 +1,48 @@
+
+__pycache__/
+gsheet_api.json
+MCAT KPIs Metrics Data.gsheet
+.posit
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.env
+.venv/
+venv/
+env/
+*.sqlite3
+
+
+# ---------------------
+# Jupyter / Streamlit
+# ---------------------
+.ipynb_checkpoints/
+.streamlit/secrets.toml
+.streamlit/config.toml
+.cache/
+logs/
+*.log
+
+# ---------------------
+# OS-specific files
+# ---------------------
+.DS_Store
+Thumbs.db
+
+# ---------------------
+# IDEs / Editors
+# ---------------------
+.vscode/
+.idea/
+*.code-workspace
+
+# ---------------------
+# Data files (optional)
+# Uncomment if you don’t want data files tracked
+# ---------------------
+# *.csv
+# *.xlsx
+# *.json
+# *.parquet

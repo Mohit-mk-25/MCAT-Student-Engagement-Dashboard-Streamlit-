@@ -1,0 +1,142 @@
+/* Global dark theme - Force dark background everywhere */
+.stApp {
+    background-color: #f8f4f4ad !important;
+}
+
+/* Main container */
+.main > div {
+    background-color: #f8f4f4ad !important;
+}
+
+    /* Block container - main content area */
+    .block-container {
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+    background-color: #f8f4f4ad !important;
+}
+
+/* Header and top area */
+header[data-testid="stHeader"] {
+    background-color: #f8f4f4ad !important;
+    height: 0px;
+}
+
+/* Sidebar collapse/expand button (>>) - Make it highly visible */
+button[kind="header"][data-testid="collapsedControl"] {
+    background-color: #4CAF50 !important;   /* Bright green background */
+    color: #ffffff !important;              /* White arrow */
+    border: 2px solid #ffffff !important;  /* White border */
+    border-radius: 4px !important;         /* Rounded corners */
+    padding: 4px 8px !important;           /* More padding */
+    font-size: 14px !important;            /* Larger size */
+}
+
+button[kind="header"][data-testid="collapsedControl"]:hover {
+    background-color: #45a049 !important;  /* Darker green on hover */
+    transform: scale(1.1) !important;      /* Slight grow effect */
+}
+
+/* Alternative selector for sidebar expand button */
+.css-1y0tads, .css-17ziqus {
+    background-color: #4CAF50 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+}
+
+/* Sidebar styling */
+.css-1d391kg, .css-1lcbmhc, .e1fqkh3o1 {
+    background-color: #f8f4f4ad !important;
+}
+
+/* Force all text to be light colored */
+.stApp, .stApp > div, .main, .block-container {
+    color: #000000 !important;
+}
+
+/* Sidebar dark theme with visible text and buttons */
+section[data-testid="stSidebar"] {
+    background-color: #f8f4f4ad !important;
+    color: #000000 !important;
+}
+
+section[data-testid="stSidebar"] > div {
+    background-color: #f8f4f4ad !important;
+    color: #000000 !important;
+}
+
+/* Make sidebar buttons (including filter icon) highly visible */
+section[data-testid="stSidebar"] .stButton > button {
+    background-color: #4CAF50 !important;    /* Bright green background */
+    color: #000000 !important;               /* White text/icon */
+    border: 2px solid #000000 !important;   /* White border for contrast */
+    font-weight: bold !important;           /* Bold text */
+    font-size: 16px !important;             /* Larger icon size */
+    padding: 8px 12px !important;           /* More padding */
+    border-radius: 8px !important;          /* Rounded corners */
+}
+
+/* Hover effect for better interaction */  
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background-color: #45a049 !important;   /* Darker green on hover */
+    border: 2px solid #000000 !important;   /* Keep white border */
+    transform: scale(1.05) !important;      /* Slight grow effect */
+}
+
+/* Make all sidebar text visible */
+section[data-testid="stSidebar"] * {
+    color: #000000 !important;
+    font-weight: bold;
+}
+
+/* Input widgets dark theme */
+.stSelectbox > div > div {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.stMultiSelect > div > div {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* Button styling for dark theme */
+.stButton > button {
+    background-color: #4CAF50 !important;
+    color: rgb(0, 0, 0) !important;
+    border: none !important;
+}
+
+.stButton > button:hover {
+    background-color: #45a049 !important;
+}
+
+/* Checkbox styling */
+.stCheckbox {
+    color: #000000 !important;
+}
+
+/* Metric widgets */
+div[data-testid="metric-container"] {
+    background-color: #f8f4f4ad !important;
+    border: 1px solid #333 !important;
+    padding: 1rem !important;
+    border-radius: 8px !important;
+}
+
+/* Top toolbar and elements */
+.css-1rs6os, .css-17eq0hr {
+    background-color: #ffffff !important;
+}
+
+
+.main .block-container {
+    background-color: #ffffff !important;
+}
+
+
+/* Force all divs in main app to inherit dark background */
+.stApp > div, .stApp div {
+    background-color: inherit !important;
+}
