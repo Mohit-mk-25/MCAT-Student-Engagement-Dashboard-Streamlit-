@@ -91,8 +91,7 @@ year_colors = {
     "2025": "#00923D",  # Green
 }
 years = [2023,2024,2025]
-## Create a line chart for a specific metric
-kpis_metrics_definition = read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Kpi_Metrics_definition')
+
 def create_metric_chart(df, month_prefix,metric_prefix,y_label , chart_title):
     # Select columns that match this metric
     # value_cols = [col for col in df.columns if col.startswith(metric_prefix)]
@@ -150,7 +149,6 @@ def add_heading(text, level=1, color="#000000", align="center", margin_top=10, m
     """
     st.markdown(html, unsafe_allow_html=True)
 
-
 def add_gsheet_link(url, text="View Full Pivot Data"):
     html = f"""
     <div style="
@@ -169,9 +167,7 @@ def add_gsheet_link(url, text="View Full Pivot Data"):
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
-
-
-
+kpis_metrics_definition = read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Kpi_Metrics_definition')
 @st.cache_data
 def calc_avg(df ,selected_products):
     df_f = df[df["product_code"].isin(selected_products)]
@@ -211,7 +207,6 @@ def calc_active_users(df , selected_products):
     v2025 = df_f["total_active_user_25"].sum()  
     title = df_f["Parameter"].iloc[0]
     return title, v2024, v2025
-
 
 @st.cache_data
 def get_req_filtered_df(df_in, prod_code , param_col,agg_col):

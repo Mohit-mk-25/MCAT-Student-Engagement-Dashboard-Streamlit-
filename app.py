@@ -5,6 +5,17 @@ import sys
 import time
 import calendar
 from datetime import datetime
+from helper_function import add_heading , create_metric_chart ,display_chart_with_lines,add_gsheet_link,get_req_filtered_df_scores,get_req_filtered_df_act_ques_pt
+from helper_function import calc_avg , calc_active_users,get_req_filtered_df,build_cards_html , load_to_gsheets , read_from_gsheets,read_from_gsheets_area
+
+st.set_page_config(
+    page_title="MCAT Dashboard", 
+    page_icon="📊", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+
 today = datetime.today()
 prev_month = today.month - 1 if today.month > 1 else 12
 prev_month = calendar.month_name[prev_month]
@@ -33,17 +44,6 @@ def compatible_rerun():
         # Silent fallback - don't break the app
         pass
 
-from helper_function import add_heading , create_metric_chart ,display_chart_with_lines,add_gsheet_link,get_req_filtered_df_scores,get_req_filtered_df_act_ques_pt
-from helper_function import calc_avg , calc_active_users,get_req_filtered_df,build_cards_html , load_to_gsheets , read_from_gsheets,read_from_gsheets_area
-
-st.set_page_config(
-    page_title="MCAT Dashboard", 
-    page_icon="📊", 
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-
 @st.cache_data(ttl=900)  # Cache for 15 minutes - Compatible with Streamlit 1.50+
 def load_data():
     """Load all data from Google Sheets with caching"""
@@ -55,12 +55,11 @@ def load_data():
         'prod_score_gain_data': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Score_Gain_Sheet'),
         'DScBd_metrics': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Detailed Score Breakdown_Metrics'),
         'monthly_fl_metrics': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Monthly Full Length Engagement_metrics'),   
-        'monthwise_act_ques_pt_metrics': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Monthwise Activity_Questions_PT_metrics'),
+        'monthwise_act_ques_pt_metrics': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Monthwise Activity_Questions_PT_metrics(Act_month)'),
+        'monthwise_act_ques_pt_metrics_exp': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Monthwise Activity_Questions_PT_metrics(Expiry_month)'),
         'act_comp_trend': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Activity_Completion_Trends(30_60_90_days)_metrics'),
         'ques_comp_trend': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Ques_Ans_Completion_Trends(30_60_90_days)_metrics')
     }
-
-
 
 # Load all data with caching and error handling
 try:
@@ -83,6 +82,7 @@ try:
     DScBd_metrics = data['DScBd_metrics']
     monthly_fl_metrics = data['monthly_fl_metrics']
     monthwise_act_ques_pt_metrics = data['monthwise_act_ques_pt_metrics']
+    monthwise_act_ques_pt_metrics_exp = data['monthwise_act_ques_pt_metrics_exp']
     prod_score_gain_data = data['prod_score_gain_data']
     act_comp_trend = data['act_comp_trend']
     ques_comp_trend = data['ques_comp_trend']
@@ -93,6 +93,7 @@ try:
         st.stop()
         
 except Exception as e:
+    print(e)
     st.error(f"🚨 Error loading data: {str(e)}")
     st.info("💡 This might be a temporary connectivity issue. Please refresh the page.")
     st.stop()
@@ -356,7 +357,7 @@ with col3:
 with col4:
     display_chart_with_lines(create_metric_chart(aamc5, 'Activity_month',"AAMC5_Avg_Score",'Score','AAMC5 Average Score'))
 
-## Monthwise Activity, Questions and Practice Test
+## Monthwise Activity, Questions and Practice Test by Activity Month
 add_heading("Monthwise Activity, Questions Answered & Practice Test Per User by Activity Month", level=3, color="#000000")
 month_act = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics.iloc[:,0:8], st.session_state.selected_products, 'Activity_month', 'Avg_Activity', 'sequence_title',)
 month_ques = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics.iloc[:,8:16], st.session_state.selected_products, 'Activity_month', 'Avg Question Answered', 'total_scored_items_answered')
@@ -369,6 +370,21 @@ with col2:
     display_chart_with_lines(create_metric_chart(month_ques, 'Activity_month',"Avg Question Answered",'Average Questions Answered','Average Questions Answered'))
 with col3:
     display_chart_with_lines(create_metric_chart(month_pt, 'Activity_month',"Avg Practice Test",'Average Practice Test','Average Practice Test'))
+
+## Monthwise Activity, Questions and Practice Test by Expiry Month
+add_heading("Monthwise Activity, Questions Answered & Practice Test Per User by Expiry Month", level=3, color="#000000")
+exp_month_act = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics_exp.iloc[:,0:8], st.session_state.selected_products, 'Expiry_month', 'Avg_Activity', 'sequence_title',)
+exp_month_ques = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics_exp.iloc[:,8:16], st.session_state.selected_products, 'Expiry_month', 'Avg Question Answered', 'total_scored_items_answered')
+exp_month_pt = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics_exp.iloc[:,16:24], st.session_state.selected_products, 'Expiry_month', 'Avg Practice Test', 'sequence_name')
+
+col1, col2, col3  = st.columns(3)
+with col1:
+    display_chart_with_lines(create_metric_chart(exp_month_act, 'Expiry_month',"Avg_Activity",'Average Activity','Average Activity'))
+with col2:
+    display_chart_with_lines(create_metric_chart(exp_month_ques, 'Expiry_month',"Avg Question Answered",'Average Questions Answered','Average Questions Answered'))
+with col3:
+    display_chart_with_lines(create_metric_chart(exp_month_pt, 'Expiry_month',"Avg Practice Test",'Average Practice Test','Average Practice Test'))
+
 
 ## Activities Completed Trends 30,60,90 days
 add_heading("Activity Completion Trend First 30,60,90 days from ESD", level=3, color="#000000")
