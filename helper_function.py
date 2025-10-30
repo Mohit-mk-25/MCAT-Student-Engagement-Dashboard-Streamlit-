@@ -132,20 +132,25 @@ def create_metric_chart(df, month_prefix,metric_prefix,y_label , chart_title):
     )
     return fig
 ## Helper function to add styled headings
-def add_heading(text, level=1, color="#000000", align="center", margin_top=10, margin_bottom=5):
-    """
-    Display a styled heading in Streamlit.
-    """
+def add_heading(text , tooltip_text=""):
     html = f"""
-    <h{level} style="
-        color: {color};
-        text-align: {align};
-        margin-top: {margin_top}px;
-        margin-bottom: {margin_bottom}px;
-        font-family: 'Arial', sans-serif;
-    ">
+    <div style="
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;">
+  
+    <div style='text-align: center; font-size: 30px; font-weight: bold;'>
         {text}
-    </h{level}>
+    </div>
+    <div class="tooltip">
+        ℹ️
+        <span class="tooltiptext">
+            {tooltip_text}
+        </span>
+    </div>
+    </div>
     """
     st.markdown(html, unsafe_allow_html=True)
 
@@ -235,7 +240,6 @@ def get_req_filtered_df_scores(df_in, prod_code , agg_month,param_col,agg_col,pr
         final_df = pd.merge(final_df, agg_df, on=agg_month, how='left')
     final_df = final_df.fillna(0)
     final_df = final_df.replace(0,'')
-    # print(prefix_name , prod_code, final_df.head())
     return final_df
 
 def get_req_filtered_df_act_ques_pt(df_in, prod_code , agg_month,param_col,agg_col):
@@ -250,7 +254,6 @@ def get_req_filtered_df_act_ques_pt(df_in, prod_code , agg_month,param_col,agg_c
         final_df = pd.merge(final_df, agg_df, on=agg_month, how='left')
     final_df = final_df.fillna(0)
     final_df = final_df.replace(0,'')
-    # print(param_col , final_df.columns)
     return final_df
 
 def build_cards_html(registry , selected_products):
@@ -259,6 +262,8 @@ def build_cards_html(registry , selected_products):
     for item in registry:
         df = item["df"]
         calc = item["calc"]
+        tool_tip_text = item.get("Tooltip_text")
+        print("Tooltip text in build cards html", tool_tip_text)
         result = calc(df , selected_products)
         if result is None:
             # optional: show a placeholder card for empty result
@@ -300,9 +305,9 @@ def build_cards_html(registry , selected_products):
     <div class="kpi-title">
         {title}
         <span class="tooltip">
-            💡
+            ℹ️
             <span class="tooltiptext">
-                {KPIs_def}
+                {tool_tip_text}
             </span>
         </span>
     </div>
@@ -318,3 +323,13 @@ def build_cards_html(registry , selected_products):
     # Join cards cleanly without extra newlines or spaces
     return "\n".join(cards)
 
+
+    html = f"""
+    <div class="tooltip">
+        💡
+        <span class="tooltiptext">
+            {test}
+        </span>
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)

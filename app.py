@@ -5,8 +5,8 @@ import sys
 import time
 import calendar
 from datetime import datetime
-from helper_function import add_heading , create_metric_chart ,display_chart_with_lines,add_gsheet_link,get_req_filtered_df_scores,get_req_filtered_df_act_ques_pt
-from helper_function import calc_avg , calc_active_users,get_req_filtered_df,build_cards_html , load_to_gsheets , read_from_gsheets,read_from_gsheets_area
+from helper_function import add_heading,create_metric_chart ,display_chart_with_lines,add_gsheet_link,get_req_filtered_df_scores,get_req_filtered_df_act_ques_pt
+from helper_function import calc_avg , calc_active_users,get_req_filtered_df,build_cards_html , read_from_gsheets,read_from_gsheets_area
 
 st.set_page_config(
     page_title="MCAT Dashboard", 
@@ -58,7 +58,8 @@ def load_data():
         'monthwise_act_ques_pt_metrics': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Monthwise Activity_Questions_PT_metrics(Act_month)'),
         'monthwise_act_ques_pt_metrics_exp': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Monthwise Activity_Questions_PT_metrics(Expiry_month)'),
         'act_comp_trend': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Activity_Completion_Trends(30_60_90_days)_metrics'),
-        'ques_comp_trend': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Ques_Ans_Completion_Trends(30_60_90_days)_metrics')
+        'ques_comp_trend': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Ques_Ans_Completion_Trends(30_60_90_days)_metrics'),
+        'kpis_metric_def': read_from_gsheets('1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4','Kpi_Metrics_definition')
     }
 
 # Load all data with caching and error handling
@@ -86,6 +87,7 @@ try:
     prod_score_gain_data = data['prod_score_gain_data']
     act_comp_trend = data['act_comp_trend']
     ques_comp_trend = data['ques_comp_trend']
+    kpis_metrics_definition = data['kpis_metric_def']
     
     # Validate data loaded successfully
     if product_code_df.empty:
@@ -107,7 +109,15 @@ except FileNotFoundError:
     st.warning("⚠️ CSS file not found. Using default styling.")
 except Exception as e:
     st.warning(f"⚠️ CSS loading issue: {e}")
-st.markdown("<h1 style='text-align: center;'>MCAT Student Engagement Dashboard 📊</h1>", unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <div style='margin-top:0.5rem; text-align: center; font-size: 40px; font-weight: bold;'>
+        MCAT Student Engagement Dashboard 📊
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 add_gsheet_link('https://docs.google.com/spreadsheets/d/1wZmKXpk0nXaQb1aNvzjb-PFkVlpqvOc8Lj4_o49oso4/','Data Source Link to all Kpis and Metrics')
 
 # Initialize session state variables after data is loaded successfully
@@ -228,18 +238,18 @@ with filter_status_container:
 
 #--- KPIs calculation and display- Start
 kpi_registry = [
-    {"df": score_gain_kpi, "calc": calc_avg},
-    {"df": act_per_user_kpi, "calc": calc_avg},
-    {"df": active_user_kpi, "calc": calc_active_users},
-    {"df": ques_ans_kpi, "calc": calc_avg},
-    {"df": test_per_user_kpi, "calc": calc_avg},
+    {"df": score_gain_kpi, "calc": calc_avg , "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Score Gain', 'Definition'].iloc[0]},
+    {"df": act_per_user_kpi, "calc": calc_avg, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Avg Activity / User', 'Definition'].iloc[0]},
+    {"df": active_user_kpi, "calc": calc_active_users, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Active Users', 'Definition'].iloc[0]},
+    {"df": ques_ans_kpi, "calc": calc_avg, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Avg Questions Answered / User', 'Definition'].iloc[0]},
+    {"df": test_per_user_kpi, "calc": calc_avg, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Avg Tests / User', 'Definition'].iloc[0]},
 ]
 kpi_registry_pm = [
-    {"df": score_gain_kpi_pm, "calc": calc_avg},
-    {"df": act_per_user_kpi_pm, "calc": calc_avg},
-    {"df": active_user_kpi_pm, "calc": calc_active_users},
-    {"df": ques_ans_kpi_pm, "calc": calc_avg},
-    {"df": test_per_user_kpi_pm, "calc": calc_avg}
+    {"df": score_gain_kpi_pm, "calc": calc_avg, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Score Gain', 'Definition'].iloc[0]},
+    {"df": act_per_user_kpi_pm, "calc": calc_avg, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Avg Activity / User', 'Definition'].iloc[0]},
+    {"df": active_user_kpi_pm, "calc": calc_active_users, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Active Users', 'Definition'].iloc[0]},
+    {"df": ques_ans_kpi_pm, "calc": calc_avg, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Avg Questions Answered / User', 'Definition'].iloc[0]},
+    {"df": test_per_user_kpi_pm, "calc": calc_avg, "Tooltip_text":kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Avg Tests / User', 'Definition'].iloc[0]}
 ]
 
 # Safety check for empty selections
@@ -278,7 +288,8 @@ score_gain_colors = {
     "2024": "#0016A8",  # Blue
     "2025": "#00923D",  # Green
 }
-add_heading("Score Gain by Expiry Month", level=3, color="#000000")
+score_gain_tooltip = kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Score Gain Metrics', 'Definition'].iloc[0]
+add_heading(f"Score Gain by Expiry Month", score_gain_tooltip)
 fig = px.line(
     score_gain_melted,
     x="Expiry_month",
@@ -311,7 +322,8 @@ st.plotly_chart(fig, use_container_width=True)
 st.markdown('<hr class="chart-line">', unsafe_allow_html=True)
 
 # Detailed Score Breakdown Charts
-add_heading("Detailed Score Breakdown by Expiry Month", level=3, color="#000000")
+detailed_score_tooltip = kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Detailed Score Breakdown', 'Definition'].iloc[0]
+add_heading("Detailed Score Breakdown by Expiry Month", detailed_score_tooltip)
 # Display three charts side by side
 first_score_ch_filt = get_req_filtered_df_scores(DScBd_metrics.iloc[:,0:8],st.session_state.selected_products ,'Expiry_month', 'Score_Avg' , 'score_scaled_score','First')
 max_score_ch_filt = get_req_filtered_df_scores(DScBd_metrics.iloc[:,8:16],st.session_state.selected_products ,'Expiry_month', 'Score_Avg' , 'score_scaled_score','Max')
@@ -328,7 +340,8 @@ with col3:
     display_chart_with_lines(create_metric_chart(latest_score_ch_filt, 'Expiry_month',"Latest_Score_Avg",'Score','Latest Score Average'))
 
 ## Month Wise Full length 
-add_heading("Monthly Full Length Score Averages by Activity Month", level=3, color="#000000")
+monthly_Fl_act_month_tooltip = kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'FL Score changes (Activity Month)', 'Definition'].iloc[0]
+add_heading("Monthly Full Length Score Averages by Activity Month", monthly_Fl_act_month_tooltip)
 aamc1 = get_req_filtered_df_scores(monthly_fl_metrics.iloc[:,0:8], st.session_state.selected_products, 'Activity_month','Avg_Score', 'score_scaled_score', 'AAMC1')
 kfl1 = get_req_filtered_df_scores(monthly_fl_metrics.iloc[:,8:16], st.session_state.selected_products, 'Activity_month','Avg_Score', 'score_scaled_score', 'KFL1')
 kfl2 = get_req_filtered_df_scores(monthly_fl_metrics.iloc[:,16:24], st.session_state.selected_products, 'Activity_month','Avg_Score', 'score_scaled_score', 'KFL2')
@@ -358,7 +371,8 @@ with col4:
     display_chart_with_lines(create_metric_chart(aamc5, 'Activity_month',"AAMC5_Avg_Score",'Score','AAMC5 Average Score'))
 
 ## Monthwise Activity, Questions and Practice Test by Activity Month
-add_heading("Monthwise Activity, Questions Answered & Practice Test Per User by Activity Month", level=3, color="#000000")
+monthwise_eng_act_month_tooltip = kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Total Engagment Metrics(Activity Month)', 'Definition'].iloc[0]
+add_heading("Monthwise Activity, Questions Answered & Practice Test Per User by Activity Month", monthwise_eng_act_month_tooltip)
 month_act = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics.iloc[:,0:8], st.session_state.selected_products, 'Activity_month', 'Avg_Activity', 'sequence_title',)
 month_ques = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics.iloc[:,8:16], st.session_state.selected_products, 'Activity_month', 'Avg Question Answered', 'total_scored_items_answered')
 month_pt = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics.iloc[:,16:24], st.session_state.selected_products, 'Activity_month', 'Avg Practice Test', 'sequence_name')
@@ -372,7 +386,8 @@ with col3:
     display_chart_with_lines(create_metric_chart(month_pt, 'Activity_month',"Avg Practice Test",'Average Practice Test','Average Practice Test'))
 
 ## Monthwise Activity, Questions and Practice Test by Expiry Month
-add_heading("Monthwise Activity, Questions Answered & Practice Test Per User by Expiry Month", level=3, color="#000000")
+monthwise_eng_exp_month_tooltip = kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Total Engagment Metrics(Expiry Month)', 'Definition'].iloc[0]
+add_heading("Monthwise Activity, Questions Answered & Practice Test Per User by Expiry Month", monthwise_eng_exp_month_tooltip)
 exp_month_act = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics_exp.iloc[:,0:8], st.session_state.selected_products, 'Expiry_month', 'Avg_Activity', 'sequence_title',)
 exp_month_ques = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics_exp.iloc[:,8:16], st.session_state.selected_products, 'Expiry_month', 'Avg Question Answered', 'total_scored_items_answered')
 exp_month_pt = get_req_filtered_df_act_ques_pt(monthwise_act_ques_pt_metrics_exp.iloc[:,16:24], st.session_state.selected_products, 'Expiry_month', 'Avg Practice Test', 'sequence_name')
@@ -387,7 +402,8 @@ with col3:
 
 
 ## Activities Completed Trends 30,60,90 days
-add_heading("Activity Completion Trend First 30,60,90 days from ESD", level=3, color="#000000")
+act_comp_trend_tooltip = kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Activity completion trend', 'Definition'].iloc[0]
+add_heading("Activity Completion Trend First 30,60,90 days from ESD", act_comp_trend_tooltip)
 act_30_days = get_req_filtered_df_act_ques_pt(act_comp_trend.iloc[:,0:8], st.session_state.selected_products, 'ESD_month', 'Activity_30_days', 'sequence_title')
 act_60_days = get_req_filtered_df_act_ques_pt(act_comp_trend.iloc[:,8:16], st.session_state.selected_products, 'ESD_month', 'Activity_60_days', 'sequence_title')
 act_90_days = get_req_filtered_df_act_ques_pt(act_comp_trend.iloc[:,16:24], st.session_state.selected_products, 'ESD_month', 'Activity_90_days', 'sequence_title')
@@ -401,7 +417,8 @@ with col3:
     display_chart_with_lines(create_metric_chart(act_90_days, 'ESD_month',"Activity_90_days",'Activity Completed in 90 Days','Activity Completed in 90 Days'))
 
 ## Questions Completed Trends 30,60,90 days
-add_heading("Questions Completion Trend First 30,60,90 days from ESD", level=3, color="#000000")
+ques_comp_trend_tooltip = kpis_metrics_definition.loc[kpis_metrics_definition['KPI_Metrics'] == 'Question completion trend', 'Definition'].iloc[0]
+add_heading("Questions Completion Trend First 30,60,90 days from ESD", ques_comp_trend_tooltip)
 ques_30_days = get_req_filtered_df_act_ques_pt(ques_comp_trend.iloc[:,0:8], st.session_state.selected_products, 'ESD_month', 'Ques_Ans_30_days', 'total_scored_items_answered')
 ques_60_days = get_req_filtered_df_act_ques_pt(ques_comp_trend.iloc[:,8:16], st.session_state.selected_products, 'ESD_month', 'Ques_Ans_60_days', 'total_scored_items_answered')
 ques_90_days = get_req_filtered_df_act_ques_pt(ques_comp_trend.iloc[:,16:24], st.session_state.selected_products, 'ESD_month', 'Ques_Ans_90_days', 'total_scored_items_answered')
